@@ -5,7 +5,7 @@
 
 namespace gameaudio {
 	class WavDecoder : public IDecoder {
-		uint64 _dataSize, _length;
+		uint64 _length;
 		unsigned _frequency, _channelsNum, _bitNum;
 		unsigned _initialDataPos;
 		boost::shared_ptr<IFileReader> _reader;

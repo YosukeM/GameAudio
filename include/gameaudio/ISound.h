@@ -2,6 +2,7 @@
 #define GAMEAUDIO_ISOUND_H_
 
 #include "Vector3.h"
+#include "IFileReader.h"
 
 namespace gameaudio {
 	class ISound {
@@ -24,10 +25,10 @@ namespace gameaudio {
 
 		virtual void rewind() = 0;
 
-		virtual void setPlayPositionBySamples(unsigned) = 0;
+		virtual void setPlayPositionBySamples(uint64) = 0;
 		virtual void setPlayPositionBySecs(float) = 0;
 
-		virtual unsigned getPlayPositionBySamples() const = 0;
+		virtual uint64 getPlayPositionBySamples() const = 0;
 		virtual float getPlayPositionBySecs() const = 0;
 
 		virtual void setPitch(float) = 0;

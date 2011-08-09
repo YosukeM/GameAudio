@@ -98,10 +98,10 @@ bool WavDecoder::init(boost::shared_ptr<IFileReader> reader) {
 			if (data_read) return false;
 
 			GET4;
-			_dataSize = read4(buf4);
+			unsigned data_size = read4(buf4);
 
 			_initialDataPos = data_pos;
-			reader->seek(data_pos + _dataSize);
+			reader->seek(data_pos + data_size);
 
 			data_read = true;
 
@@ -110,7 +110,7 @@ bool WavDecoder::init(boost::shared_ptr<IFileReader> reader) {
 		}
 	}
 
-	_length = _dataSize / _channelsNum / (_bitNum / 2);
+	_length = data_size / _channelsNum / (_bitNum / 8);
 	_reader = reader;
 	return true;
 }

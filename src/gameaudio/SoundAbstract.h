@@ -1,7 +1,6 @@
-#ifndef INCLUDED_SOUND_H_
-#define INCLUDED_SOUND_H_
+#ifndef INCLUDED_SOUNDABSTRACT_H_
+#define INCLUDED_SOUNDABSTRACT_H_
 
-#include <boost/shared_ptr.hpp>
 #include "../../include/gameaudio/ISound.h"
 #include <alc.h>
 #include <al.h>
@@ -10,19 +9,14 @@ namespace gameaudio {
 	class IFileReader;
 	class StreamBuffer;
 
-	class Sound : public ISound {
-		bool _isStream, _isLooped;
-		unsigned _loopPosition;
+	class SoundAbstract : public ISound {
+	protected:
 		ALuint _alSource;
-		union {
-			ALuint _alBuffer;
-			StreamBuffer *_streamBuffer;
-		}
 	public:
-		Sound(boost::shared_ptr<IFileReader>, bool loop, bool stream, unsigned looppos, encoding_type);
-		~Sound();
+		SoundAbstract();
+		~SoundAbstract();
 
-		void update();
+		virtual void update();
 
 		// external methods:
 		virtual void play();
@@ -32,10 +26,10 @@ namespace gameaudio {
 
 		virtual void rewind();
 
-		virtual void setPlayPositionBySamples(unsigned);
+		virtual void setPlayPositionBySamples(uint64);
 		virtual void setPlayPositionBySecs(float);
 
-		virtual unsigned getPlayPositionBySamples() const;
+		virtual uint64 getPlayPositionBySamples() const;
 		virtual float getPlayPositionBySecs() const;
 
 		virtual void setPitch(float);

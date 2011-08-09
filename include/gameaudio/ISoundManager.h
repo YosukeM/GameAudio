@@ -19,11 +19,18 @@ namespace gameaudio {
 	public:
 		virtual ISound& createSound(const char* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO) = 0;
 		virtual ISound& createSound(const wchar_t* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO) = 0;
-		
+		virtual void removeSound(ISound&) = 0;
+
 		virtual IListener& getListener() const = 0;
 
 		virtual void addFileFactory(IFileFactory*) = 0;
 		virtual void removeFileFactory(IFileFactory*) = 0;
+
+		virtual void setDopplerFactor(float) = 0;
+		virtual float getDopplerFactor() = 0;
+
+		virtual void setSpeedOfSound(float) = 0;
+		virtual float getSpeedOfSound() = 0;
 	};
 };
 
