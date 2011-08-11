@@ -27,6 +27,8 @@ namespace gameaudio {
 		boost::mutex *_mutex;
 		boost::thread *_thread;
 		volatile bool _threadEnd;
+		volatile bool _modified;
+		SoundAbstract* _lastModified;
 
 		SoundAbstract* _createSound(IFileReader*, ISound::encoding_type, bool stream, bool loop, unsigned looppos);
 		void _update();

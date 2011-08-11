@@ -23,7 +23,7 @@ namespace gameaudio {
 		} state_type;
 		volatile state_type _status[2];
 		int _statePosition;
-		uint64 _loadedPosition;
+		uint64 _loadedPosition, _queuedPosition;
 		bool _isLooped;
 		unsigned _loopPosition;
 		boost::mutex *_mutex;

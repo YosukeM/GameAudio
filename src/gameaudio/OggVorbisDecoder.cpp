@@ -74,10 +74,10 @@ unsigned OggVorbisDecoder::read(void* buf, uint64 position_by_samples, unsigned 
 
 	int current_stream = 0;
 	char* buffer = (char*)buf;
-	uint64 total = 0;
+	unsigned total = 0;
 
 	while (total < bytes_to_read) {
-		int v = ov_read(&_vf, buffer, bytes_to_read, 0, 2, 1, &current_stream);
+		int v = ov_read(&_vf, buffer + total, bytes_to_read - total, 0, 2, 1, &current_stream);
 		switch (v) {
 		case OV_HOLE:
 			return 0;
@@ -89,7 +89,6 @@ unsigned OggVorbisDecoder::read(void* buf, uint64 position_by_samples, unsigned 
 			return total;
 		}
 		total += v;
-		buffer += v;
 	}
 	return total;
 }

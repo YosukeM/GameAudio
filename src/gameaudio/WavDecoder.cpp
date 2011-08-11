@@ -132,6 +132,12 @@ unsigned WavDecoder::getBitNum() const {
 }
 
 unsigned WavDecoder::read(void* data, uint64 position_by_samples, unsigned bytes_to_read) {
-	_reader->seek(_initialDataPos + position_by_samples * getChannelsNum() * (getBitNum() / 8));
-	return _reader->read(data, bytes_to_read);
+	unsigned bytes_par_sample = getChannelsNum() * (getBitNum() / 8);
+	_reader->seek(_initialDataPos + position_by_samples * bytes_par_sample);
+	unsigned read_size = _reader->read(data, bytes_to_read);
+	if (read_size != bytes_to_read) {
+		// end of sound
+		_length = position_by_samples + read_size / bytes_par_sample;
+	}
+	return read_size;
 }

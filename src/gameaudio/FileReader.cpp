@@ -15,6 +15,7 @@ FileReader::~FileReader() {
 	
 unsigned FileReader::read(void* buffer, unsigned size_to_read) {
 	_ifstream->read((char*)buffer, size_to_read);
+	if (_ifstream->eof()) _ifstream->clear();
 	return _ifstream->gcount();
 }
 
@@ -32,6 +33,7 @@ bool FileReader::seek(uint64 pos, seek_type whence) {
 		break;
 	}
 	_ifstream->seekg(pos, dir);
+	
 	return _ifstream->good();
 }
 

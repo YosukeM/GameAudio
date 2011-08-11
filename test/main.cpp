@@ -7,6 +7,8 @@
 	#include <string>
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 using namespace gameaudio;
 using namespace std;
 
@@ -18,14 +20,16 @@ int main(int argc, const char** argv) {
 	GetCurrentDirectory(MAX_PATH, szDirectoryName);
 	SetCurrentDirectory((std::wstring(szDirectoryName) + TEXT("/../")).c_str());
 #endif
-	char c;	// wait
 	
 	ISoundManager& sm = getSoundManager();
 
-	ISound& sound2 = sm.createSound("test/sound.wav", true, false, 44100);
-	sound2.play();
+	ISound& sound = sm.createSound("test/sound.wav", false, true);
+	sound.play();
 	
-	cin >> c;
+	while (true) {
+		cout << boost::lexical_cast<string>(sound.getPlayPositionBySecs()) << endl;
+		usleep(100000);
+	}
 	
 	return 0;
 }

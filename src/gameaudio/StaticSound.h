@@ -7,8 +7,15 @@
 namespace gameaudio {
 	class StaticSound : public SoundAbstract {
 		ALuint _alBuffer;
+		unsigned _frequency;
+		uint64 _size;
 	public:
 		StaticSound(boost::shared_ptr<IFileReader> reader, encoding_type encoding);
+		
+		virtual void update();
+		
+		virtual float getPlayPositionBySecs() const;
+		virtual void setPlayPositionBySecs(float);
 	};
 }
 

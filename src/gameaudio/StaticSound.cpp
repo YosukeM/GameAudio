@@ -29,4 +29,21 @@ StaticSound::StaticSound(boost::shared_ptr<IFileReader> reader, encoding_type en
 	delete[] data;
 	
 	alSourcei(_alSource, AL_BUFFER, _alBuffer);
+	
+	_frequency = decoder->getFrequency();
+	_size = read_size / (decoder->getBitNum() / 8 * decoder->getChannelsNum());
+}
+
+void StaticSound::update() {
+	if (getPlayPositionBySamples() >= _size) {
+		setPlayPositionBySamples(0);
+	}
+}
+
+float StaticSound::getPlayPositionBySecs() const {
+	return getPlayPositionBySamples() / (float)_frequency;
+}
+
+void StaticSound::setPlayPositionBySecs(float v) {
+	setPlayPositionBySamples(v * _frequency);
 }

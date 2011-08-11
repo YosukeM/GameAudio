@@ -15,6 +15,10 @@
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 using namespace gameaudio;
 
 namespace {
@@ -30,7 +34,7 @@ ISoundManager& gameaudio::getSoundManager() {
 
 SoundManager::SoundManager()
 	: _device(NULL), _context(NULL), _listener(NULL), _defaultFileFactory(NULL),
-	_mutex(NULL), _thread(NULL), _threadEnd(false)
+	_mutex(NULL), _thread(NULL), _threadEnd(false), _modified(false), _lastModified(NULL)
 {
 	_device = alcOpenDevice(NULL);
 	if (!_device) throw Error("Cannot open OpenAL device");
@@ -44,6 +48,10 @@ SoundManager::SoundManager()
 
 	_mutex = new boost::mutex();
 	_thread = new boost::thread(boost::bind(&SoundManager::_update, this));
+	
+#ifdef _WIN32
+	SetThreadPriority(_thread->native_handle(), THREAD_PRIORITY_TIME_CRITICAL);
+#endif
 }
 
 SoundManager::~SoundManager() {
@@ -77,12 +85,16 @@ void SoundManager::_update() {
 			if (_sounds.empty()) {
 				is_empty = true;
 			} else {
+				if (_modified) {
+					itr = _sounds.lower_bound(_lastModified);
+					if (itr == _sounds.end()) itr = _sounds.begin();
+				}
 				if (is_empty) {
 					itr = _sounds.begin();
 					is_empty = false;
 				} else {
 					++itr;
-					if (itr._Ptr >= _sounds.end()._Ptr) itr = _sounds.begin();
+					if (itr == _sounds.end()) itr = _sounds.begin();
 				}
 				(*itr)->update();
 			}
@@ -144,6 +156,8 @@ ISound& SoundManager::createSound(const char* filepath, bool loop, bool stream, 
 	{
 		boost::mutex::scoped_lock lock(*_mutex);
 		_sounds.insert(sound);
+		_modified = true;
+		_lastModified = sound;
 	}
 	return *sound;
 }
@@ -164,6 +178,8 @@ ISound& SoundManager::createSound(const wchar_t* filepath, bool loop, bool strea
 	{
 		boost::mutex::scoped_lock lock(*_mutex);
 		_sounds.insert(sound);
+		_modified = true;
+		_lastModified = sound;
 	}
 	return *sound;
 }
@@ -172,6 +188,8 @@ void SoundManager::removeSound(ISound& s) {
 	boost::mutex::scoped_lock lock(*_mutex);
 	SoundAbstract *sound = dynamic_cast<SoundAbstract*>(&s);
 	_sounds.erase(sound);
+	_modified = true;
+	_lastModified = sound;
 }
 
 IListener& SoundManager::getListener() const {

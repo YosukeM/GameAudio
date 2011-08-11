@@ -13,7 +13,7 @@ namespace {
 }
 
 StreamSound::StreamSound(boost::shared_ptr<IFileReader> reader, encoding_type encode, bool is_looped, unsigned looppos)
-: _decoder(0), _statePosition(0), _isLooped(is_looped), _loopPosition(looppos), _loadedPosition(0), _mutex(0)
+: _decoder(0), _statePosition(0), _isLooped(is_looped), _loopPosition(looppos), _loadedPosition(0), _queuedPosition(0), _mutex(0)
 {
 	_mutex = new boost::mutex();
 	_status[0] = _status[1] = NOT_LOADED;
@@ -54,6 +54,10 @@ void StreamSound::update() {
 				ALuint buffer;
 				alSourceUnqueueBuffers(_alSource, 1, &buffer);
 				assert(buffer == _buffers[pos]);
+				ALint size;
+				alGetBufferi(buffer, AL_SIZE, &size);
+				_queuedPosition += size / (_decoder->getBitNum() * _decoder->getChannelsNum() / 8);
+				_queuedPosition %= _decoder->getLengthBySamples();
 				// continues
 			} else {
 				break;
@@ -61,28 +65,51 @@ void StreamSound::update() {
 		case NOT_LOADED:
 			{
 				const unsigned bytes_par_sample = _decoder->getBitNum() * _decoder->getChannelsNum() / 8;
-				const unsigned size = CHUNK_SEC_SIZE * bytes_par_sample * _decoder->getFrequency();
+				unsigned size = CHUNK_SEC_SIZE * bytes_par_sample * _decoder->getFrequency();
+				// if sound length > CHUK_SEC_SIZE * 2
+				if (size > _decoder->getSizeByBytes()) {
+					if (pos == 0) {
+						size = _decoder->getLengthBySamples() / 2 * bytes_par_sample;
+					} else {
+						size = (_decoder->getLengthBySamples() - _decoder->getLengthBySamples() / 2) * bytes_par_sample;
+					}
+				}
+				// endif
+
 				char* data = new char[size];
-				unsigned read_size = 0;
+				unsigned total_read_size = 0;
 
 				if (_isLooped) {
+					const unsigned SEEM_AS_END_OF_SOUND = 5;
+					const unsigned LOOP_LIMIT = 5;
+					unsigned count = 0;
+					unsigned eofcount = 0;
+					unsigned read_size = 0;
 					do {
-						read_size += _decoder->read(data + read_size, _loadedPosition, size - read_size);
-						_loadedPosition = (_loadedPosition + read_size / bytes_par_sample);
-						if (_loadedPosition >= _decoder->getLengthBySamples()) {
-							_loadedPosition -= _decoder->getLengthBySamples() - _loopPosition;
+						read_size = _decoder->read(data + total_read_size, _loadedPosition, size - read_size);
+						if (read_size == 0) {
+							eofcount++;
+							if (eofcount > SEEM_AS_END_OF_SOUND) {
+								_loadedPosition = _loopPosition;
+								eofcount = 0;
+								count++;
+								if (count > LOOP_LIMIT) break;
+							}
+						} else {
+							total_read_size += read_size;
+							_loadedPosition = (_loadedPosition + read_size / bytes_par_sample);
+							if (_loadedPosition >= _decoder->getLengthBySamples()) {
+								_loadedPosition -= _decoder->getLengthBySamples() - _loopPosition;
+							}
 						}
-					} while (read_size < size);
+					} while (total_read_size < size);
 				} else {
-					read_size += _decoder->read(data, _loadedPosition, size - read_size);
-					_loadedPosition = _loadedPosition + read_size / bytes_par_sample;
-					if (_loadedPosition >= _decoder->getLengthBySamples()) {
-						_loadedPosition -= _decoder->getLengthBySamples() - _loopPosition;
-					}
+					total_read_size = _decoder->read(data, _loadedPosition, size);
+					_loadedPosition = _loadedPosition + total_read_size / bytes_par_sample;
 				}
 
 				delete[] data;
-				alBufferData(_buffers[pos], _decoder->getFormat(), data, read_size, _decoder->getFrequency());
+				alBufferData(_buffers[pos], _decoder->getFormat(), data, total_read_size, _decoder->getFrequency());
 				alSourceQueueBuffers(_alSource, 1, _buffers + pos);
 				_status[pos] = NOT_PLAYED;
 			}
@@ -120,13 +147,13 @@ void StreamSound::rewind() {
 void StreamSound::setPlayPositionBySamples(uint64 pos) {
 	boost::mutex::scoped_lock lock(*_mutex);
 	_status[0] = _status[1] = NOT_LOADED;
-	_loadedPosition = pos;
+	_loadedPosition = _queuedPosition = pos;
 }
 
 void StreamSound::setPlayPositionBySecs(float pos) {
 	boost::mutex::scoped_lock lock(*_mutex);
 	_status[0] = _status[1] = NOT_LOADED;
-	_loadedPosition = (uint64)((double)pos * (double)_decoder->getFrequency());
+	_loadedPosition = _queuedPosition = (uint64)((double)pos * (double)_decoder->getFrequency());
 }
 
 uint64 StreamSound::getPlayPositionBySamples() const {
@@ -140,7 +167,7 @@ uint64 StreamSound::getPlayPositionBySamples() const {
 	}
 	ALint offset;
 	alGetSourcei(_alSource, AL_SAMPLE_OFFSET, &offset);
-	return _loadedPosition + (offset - size);
+	return (_queuedPosition + (offset - size)) % _decoder->getLengthBySamples();
 }
 
 float StreamSound::getPlayPositionBySecs() const {
