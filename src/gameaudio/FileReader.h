@@ -17,7 +17,7 @@ public:
 	
 	virtual unsigned read(void* buffer, unsigned size_to_read);
 	virtual bool seek(uint64 pos, seek_type whence = E_SEEK_BEG);
-	virtual uint64 getSize();
+	virtual uint64 getSize() const;
 	virtual uint64 tell() const;
 };
 

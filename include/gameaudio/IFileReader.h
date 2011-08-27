@@ -18,7 +18,7 @@ namespace gameaudio {
 		virtual ~IFileReader() {};
 		virtual unsigned read(void* buffer, unsigned size_to_read) = 0;
 		virtual bool seek(uint64 pos, seek_type whence = E_SEEK_BEG) = 0;
-		virtual uint64 getSize() = 0;
+		virtual uint64 getSize() const = 0;
 		virtual uint64 tell() const = 0;
 	};
 };

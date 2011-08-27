@@ -22,14 +22,25 @@
 using namespace gameaudio;
 
 namespace {
-	boost::scoped_ptr<SoundManager> gSoundManager;
+	SoundManager *gSoundManager;
+	class SMDeleter {
+	public:
+		~SMDeleter() {
+			gameaudio::releaseSoundManager();
+		};
+	} gSMDeleter;
 }
 
 ISoundManager& gameaudio::getSoundManager() {
 	if (!gSoundManager) {
-		gSoundManager.reset(new SoundManager());
+		gSoundManager = new SoundManager();
 	}
-	return *(gSoundManager.get());
+	return *(gSoundManager);
+}
+
+void gameaudio::releaseSoundManager() {
+	delete gSoundManager;
+	gSoundManager = 0;
 }
 
 SoundManager::SoundManager()
@@ -38,9 +49,9 @@ SoundManager::SoundManager()
 {
 	_device = alcOpenDevice(NULL);
 	if (!_device) throw Error("Cannot open OpenAL device");
-    _context = alcCreateContext(_device, NULL);
+	_context = alcCreateContext(_device, NULL);
 	if (!_device) throw Error("Cannot create OpenAL context");
-    alcMakeContextCurrent(_context);
+	alcMakeContextCurrent(_context);
 
 	_defaultFileFactory = new FileFactory();
 	addFileFactory(_defaultFileFactory);
@@ -58,8 +69,9 @@ SoundManager::~SoundManager() {
 	{
 		boost::mutex::scoped_lock lock(*_mutex);
 		_threadEnd = true;
-		delete _thread;
 	}
+	if (_thread->joinable()) _thread->join();
+	delete _thread;
 	delete _mutex;
 
 	foreach (ISound *sound, _sounds) {
@@ -86,8 +98,9 @@ void SoundManager::_update() {
 				is_empty = true;
 			} else {
 				if (_modified) {
-					itr = _sounds.lower_bound(_lastModified);
+					itr = _sounds.upper_bound(_lastModified);
 					if (itr == _sounds.end()) itr = _sounds.begin();
+					_modified = false;
 				}
 				if (is_empty) {
 					itr = _sounds.begin();
@@ -197,14 +210,14 @@ IListener& SoundManager::getListener() const {
 }
 
 void SoundManager::addFileFactory(IFileFactory* factory) {
-	if (_fileFactories.find(factory) != _fileFactories.end()) {
+	if (std::find(_fileFactories.begin(), _fileFactories.end(), factory) != _fileFactories.end()) {
 		throw Error("The FileFactory has already added");
 	}
-	_fileFactories.insert(factory);
+	_fileFactories.push_front(factory);
 }
 
 void SoundManager::removeFileFactory(IFileFactory* factory) {
-	std::set<IFileFactory*>::iterator itr = _fileFactories.find(factory);
+	std::list<IFileFactory*>::iterator itr = std::find(_fileFactories.begin(), _fileFactories.end(), factory);
 	if (itr == _fileFactories.end()) {
 		throw Error("The FileFactory is not added");
 	}

@@ -17,8 +17,8 @@ namespace gameaudio {
 		boost::shared_ptr<IFileReader> _reader;
 
 	public:
-		OggVorbisDecoder() {};
-		~OggVorbisDecoder() {};
+		OggVorbisDecoder();
+		~OggVorbisDecoder();
 
 		virtual bool init(boost::shared_ptr<IFileReader>);
 

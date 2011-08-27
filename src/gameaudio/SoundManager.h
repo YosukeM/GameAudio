@@ -21,7 +21,7 @@ namespace gameaudio {
 		ALCdevice* _device;
 		ALCcontext* _context;
 		std::set<SoundAbstract*> _sounds;
-		std::set<IFileFactory*> _fileFactories;
+		std::list<IFileFactory*> _fileFactories;
 		Listener *_listener;
 		FileFactory *_defaultFileFactory;
 		boost::mutex *_mutex;

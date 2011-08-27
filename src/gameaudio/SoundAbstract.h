@@ -64,6 +64,9 @@ namespace gameaudio {
 
 		virtual void setDirection(const Vector3&);
 		virtual Vector3 getDirection() const;
+
+		virtual void setIsRelative(bool);
+		virtual bool getIsRelative() const;
 	};
 };
 

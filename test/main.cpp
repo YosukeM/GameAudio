@@ -2,9 +2,11 @@
 #include <iostream>
 #ifndef _WIN32
 	#include <unistd.h>
+#define Sleep(x) usleep((x) * 1000)
 #else
 	#include <Windows.h>
 	#include <string>
+
 #endif
 
 #include <boost/lexical_cast.hpp>
@@ -18,18 +20,20 @@ int main(int argc, const char** argv) {
 #else
 	TCHAR szDirectoryName[MAX_PATH];
 	GetCurrentDirectory(MAX_PATH, szDirectoryName);
-	SetCurrentDirectory((std::wstring(szDirectoryName) + TEXT("/../")).c_str());
+	SetCurrentDirectory((std::wstring(szDirectoryName) + L"/../").c_str());
 #endif
 	
 	ISoundManager& sm = getSoundManager();
 
-	ISound& sound = sm.createSound("test/sound.wav", false, true);
+	ISound& sound = sm.createSound("/Users/yosuke/Projects/bussen/bussen/blind-evil.ogg", false, true);
 	sound.play();
 	
 	while (true) {
 		cout << boost::lexical_cast<string>(sound.getPlayPositionBySecs()) << endl;
-		usleep(100000);
+		Sleep(100);
 	}
+
+	sm.removeSound(sound);
 	
 	return 0;
 }

@@ -37,7 +37,7 @@ bool FileReader::seek(uint64 pos, seek_type whence) {
 	return _ifstream->good();
 }
 
-uint64 FileReader::getSize() {
+uint64 FileReader::getSize() const {
 	return _size;
 }
 

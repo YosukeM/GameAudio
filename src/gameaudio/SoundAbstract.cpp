@@ -88,3 +88,13 @@ PARAM_F(ConeOuterAngle, CONE_OUTER_ANGLE)
 PARAM_3F(Position, POSITION)
 PARAM_3F(Velocity, VELOCITY)
 PARAM_3F(Direction, DIRECTION)
+
+bool SoundAbstract::getIsRelative() const {
+	ALint value;
+	alGetSourcei(_alSource, AL_SOURCE_RELATIVE, &value);
+	return value != 0;
+}
+
+void SoundAbstract::setIsRelative(bool v) {
+	alSourcei(_alSource, AL_SOURCE_RELATIVE, v);
+}

@@ -10,6 +10,7 @@ namespace gameaudio {
 	class IFileFactory;
 
 	ISoundManager& getSoundManager();
+	void releaseSoundManager();
 
 	class ISoundManager {
 	protected:

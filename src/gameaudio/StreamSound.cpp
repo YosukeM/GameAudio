@@ -108,10 +108,11 @@ void StreamSound::update() {
 					_loadedPosition = _loadedPosition + total_read_size / bytes_par_sample;
 				}
 
-				delete[] data;
 				alBufferData(_buffers[pos], _decoder->getFormat(), data, total_read_size, _decoder->getFrequency());
 				alSourceQueueBuffers(_alSource, 1, _buffers + pos);
 				_status[pos] = NOT_PLAYED;
+
+				delete[] data;
 			}
 			break;
 		case NOT_PLAYED:

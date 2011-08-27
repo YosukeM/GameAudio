@@ -40,16 +40,45 @@ namespace {
 	};
 }
 
+OggVorbisDecoder::OggVorbisDecoder()
+	: _frequency(0), _channelsNum(0), _length(0)
+{
+}
+
 bool OggVorbisDecoder::init(boost::shared_ptr<IFileReader> reader) {
 	_reader = reader;
 	if (ov_open_callbacks(reader.get(), &_vf, NULL, 0, callback) != 0) return false;
 
-	_length = ov_pcm_total(&_vf, -1);
 	vorbis_info *vi = ov_info(&_vf, -1);
 	_frequency = vi->rate;
 	_channelsNum = vi->channels;
+	_length = ov_pcm_total(&_vf, -1);
+
+	/*
+	uint64 apro_size = _length * vi->bitrate_nominal / 8 / _frequency;
+	double difference = 1.0 + (double)apro_size / (double)reader->getSize();
+	if (abs(difference) < 0.3) {
+		// nothing to do
+	} else {
+		// compute accurate value
+		if (ov_raw_seek(&_vf, _length + 1) == 0) {
+			const int BUF_SIZE = 256;
+			char buffer[BUF_SIZE];
+			int current_stream = 0;
+
+			while (ov_read(&_vf, buffer, BUF_SIZE, 0, 2, 1, &current_stream) != 0) ;
+			_length = ov_pcm_tell(&_vf);
+
+			ov_raw_seek(&_vf, 0);
+		}
+	}
+	*/
 
 	return true;
+}
+
+OggVorbisDecoder::~OggVorbisDecoder() {
+	if (_frequency) ov_clear(&_vf);
 }
 
 // header infomations
