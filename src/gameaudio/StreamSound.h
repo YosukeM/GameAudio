@@ -40,6 +40,9 @@ namespace gameaudio {
 		virtual void stop();
 		virtual void rewind();
 
+		virtual uint64 getLengthBySamples() const;
+		virtual float getLengthBySecs() const;
+
 		virtual void setPlayPositionBySamples(uint64);
 		virtual void setPlayPositionBySecs(float);
 

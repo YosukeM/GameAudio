@@ -11,6 +11,9 @@ namespace gameaudio {
 		uint64 _size;
 	public:
 		StaticSound(boost::shared_ptr<IFileReader> reader, encoding_type encoding);
+
+		virtual uint64 getLengthBySamples() const;
+		virtual float getLengthBySecs() const;
 		
 		virtual void update();
 		

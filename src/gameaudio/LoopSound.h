@@ -11,6 +11,7 @@ namespace gameaudio {
 	class LoopSound : public SoundAbstract {
 		ALuint _initialBuffer, _loopBuffer;
 		unsigned _loopPosition, _frequency;
+		uint64 _length;
 		volatile bool _initialBufferProcessed;
 		boost::mutex *_mutex;
 		void _initBuffers();
@@ -23,6 +24,9 @@ namespace gameaudio {
 
 		virtual void stop();
 		virtual void rewind();
+
+		virtual uint64 getLengthBySamples() const;
+		virtual float getLengthBySecs() const;
 
 		virtual void setPlayPositionBySamples(uint64);
 		virtual void setPlayPositionBySecs(float);

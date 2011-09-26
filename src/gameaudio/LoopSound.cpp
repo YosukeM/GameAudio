@@ -42,6 +42,8 @@ LoopSound::LoopSound(boost::shared_ptr<IFileReader> reader, encoding_type encodi
 	alBufferData(_loopBuffer, format, data, read_size, decoder->getFrequency());
 	delete[] data;
 
+	_length = decoder->getLengthBySamples();
+
 	_initBuffers();
 }
 
@@ -91,6 +93,14 @@ void LoopSound::stop() {
 
 void LoopSound::rewind() {
 	setPlayPositionBySamples(0);
+}
+
+uint64 LoopSound::getLengthBySamples() const {
+	return _length;
+}
+
+float LoopSound::getLengthBySecs() const {
+	return (float)((double)_length / (double)_frequency);
 }
 
 void LoopSound::setPlayPositionBySamples(uint64 v) {

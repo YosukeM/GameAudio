@@ -145,6 +145,14 @@ void StreamSound::rewind() {
 	setPlayPositionBySamples(0);
 }
 
+uint64 StreamSound::getLengthBySamples() const {
+	return _decoder->getLengthBySamples();
+}
+
+float StreamSound::getLengthBySecs() const {
+	return (float)((double)_decoder->getLengthBySamples() / (double)_decoder->getFrequency());
+}
+
 void StreamSound::setPlayPositionBySamples(uint64 pos) {
 	boost::mutex::scoped_lock lock(*_mutex);
 	_status[0] = _status[1] = NOT_LOADED;

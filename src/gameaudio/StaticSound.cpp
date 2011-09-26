@@ -34,6 +34,14 @@ StaticSound::StaticSound(boost::shared_ptr<IFileReader> reader, encoding_type en
 	_size = read_size / (decoder->getBitNum() / 8 * decoder->getChannelsNum());
 }
 
+uint64 StaticSound::getLengthBySamples() const {
+	return _size;
+}
+
+float StaticSound::getLengthBySecs() const {
+	return (float)((double)_size / (double)_frequency);
+}
+
 void StaticSound::update() {
 	if (getPlayPositionBySamples() >= _size) {
 		setPlayPositionBySamples(0);
