@@ -25,11 +25,11 @@ int main(int argc, const char** argv) {
 	
 	ISoundManager& sm = getSoundManager();
 
-	ISound& sound = sm.createSound("/Users/yosuke/Projects/bussen/bussen/blind-evil.ogg", false, true);
-	sound.play();
+	ISound* sound = sm.createSound("/Users/yosuke/Projects/bussen/bussen/blind-evil.ogg", false, true);
+	sound->play();
 	
 	while (true) {
-		cout << boost::lexical_cast<string>(sound.getPlayPositionBySecs()) << endl;
+		cout << boost::lexical_cast<string>(sound->getPlayPositionBySecs()) << endl;
 		Sleep(100);
 	}
 

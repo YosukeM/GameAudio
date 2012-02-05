@@ -48,7 +48,12 @@ SoundManager::SoundManager()
 	_mutex(NULL), _thread(NULL), _threadEnd(false), _modified(false), _lastModified(NULL)
 {
 	_device = alcOpenDevice(NULL);
-	if (!_device) throw Error("Cannot open OpenAL device");
+	if (!_device) {
+		_device = alcOpenDevice("Generic Software");
+		if (!_device) {
+			throw Error("Cannot open OpenAL device");
+		}
+	}
 	_context = alcCreateContext(_device, NULL);
 	if (!_device) throw Error("Cannot create OpenAL context");
 	alcMakeContextCurrent(_context);
@@ -153,7 +158,7 @@ SoundAbstract* SoundManager::_createSound(IFileReader* reader, ISound::encoding_
 	return sound;
 }
 
-ISound& SoundManager::createSound(const char* filepath, bool loop, bool stream, unsigned looppos, ISound::encoding_type encoding) {
+ISound* SoundManager::createSound(const char* filepath, bool loop, bool stream, unsigned looppos, ISound::encoding_type encoding) {
 	IFileReader* reader = NULL;
 	foreach (IFileFactory* factory, _fileFactories) {
 		if (reader = factory->createFileReader(filepath)) break;
@@ -172,10 +177,10 @@ ISound& SoundManager::createSound(const char* filepath, bool loop, bool stream, 
 		_modified = true;
 		_lastModified = sound;
 	}
-	return *sound;
+	return sound;
 }
 
-ISound& SoundManager::createSound(const wchar_t* filepath, bool loop, bool stream, unsigned looppos, ISound::encoding_type encoding) {
+ISound* SoundManager::createSound(const wchar_t* filepath, bool loop, bool stream, unsigned looppos, ISound::encoding_type encoding) {
 	IFileReader* reader = NULL;
 	foreach (IFileFactory* factory, _fileFactories) {
 		if (reader = factory->createFileReader(filepath)) break;
@@ -194,19 +199,19 @@ ISound& SoundManager::createSound(const wchar_t* filepath, bool loop, bool strea
 		_modified = true;
 		_lastModified = sound;
 	}
-	return *sound;
+	return sound;
 }
 
-void SoundManager::removeSound(ISound& s) {
+void SoundManager::removeSound(ISound* s) {
 	boost::mutex::scoped_lock lock(*_mutex);
-	SoundAbstract *sound = dynamic_cast<SoundAbstract*>(&s);
+	SoundAbstract *sound = dynamic_cast<SoundAbstract*>(s);
 	_sounds.erase(sound);
 	_modified = true;
 	_lastModified = sound;
 }
 
-IListener& SoundManager::getListener() const {
-	return *_listener;
+IListener* SoundManager::getListener() const {
+	return _listener;
 }
 
 void SoundManager::addFileFactory(IFileFactory* factory) {

@@ -37,11 +37,11 @@ namespace gameaudio {
 		SoundManager();
 		~SoundManager();
 
-		virtual ISound& createSound(const char* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO);
-		virtual ISound& createSound(const wchar_t* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO);
-		virtual void removeSound(ISound&);
+		virtual ISound* createSound(const char* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO);
+		virtual ISound* createSound(const wchar_t* filepath, bool loop, bool stream, unsigned looppos = 0, ISound::encoding_type encoding = ISound::ENCODING_AUTO);
+		virtual void removeSound(ISound*);
 
-		virtual IListener& getListener() const;
+		virtual IListener* getListener() const;
 
 		virtual void addFileFactory(IFileFactory*);
 		virtual void removeFileFactory(IFileFactory*);

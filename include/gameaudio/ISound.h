@@ -69,6 +69,8 @@ namespace gameaudio {
 
 		virtual void setIsRelative(bool) = 0;
 		virtual bool getIsRelative() const = 0;
+
+		virtual unsigned getFrequency() const = 0;
 	};
 };
 

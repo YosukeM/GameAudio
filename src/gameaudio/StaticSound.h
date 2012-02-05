@@ -19,6 +19,8 @@ namespace gameaudio {
 		
 		virtual float getPlayPositionBySecs() const;
 		virtual void setPlayPositionBySecs(float);
+
+		virtual unsigned getFrequency() const;
 	};
 }
 

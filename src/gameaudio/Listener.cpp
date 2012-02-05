@@ -14,7 +14,7 @@ void Listener::setPosition(const Vector3& v) {
 
 Vector3 Listener::getPosition() const {
 	Vector3 v;
-	alGetListener3f(AL_POSITION, &(v.x), &(v.x), &(v.x));
+	alGetListener3f(AL_POSITION, &(v.x), &(v.y), &(v.z));
 	return v;
 }
 
@@ -24,7 +24,7 @@ void Listener::setVelocity(const Vector3& v) {
 
 Vector3 Listener::getVelocity() const {
 	Vector3 v;
-	alGetListener3f(AL_VELOCITY, &(v.x), &(v.x), &(v.x));
+	alGetListener3f(AL_VELOCITY, &(v.x), &(v.y), &(v.z));
 	return v;
 }
 

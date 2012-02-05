@@ -139,3 +139,7 @@ uint64 LoopSound::getPlayPositionBySamples() const {
 float LoopSound::getPlayPositionBySecs() const {
 	return getPlayPositionBySamples() / (float)_frequency;
 }
+
+unsigned LoopSound::getFrequency() const {
+	return _frequency;
+}

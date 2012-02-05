@@ -48,6 +48,8 @@ namespace gameaudio {
 
 		virtual uint64 getPlayPositionBySamples() const;
 		virtual float getPlayPositionBySecs() const;
+
+		virtual unsigned getFrequency() const;
 	};
 };
 

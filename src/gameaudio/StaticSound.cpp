@@ -55,3 +55,7 @@ float StaticSound::getPlayPositionBySecs() const {
 void StaticSound::setPlayPositionBySecs(float v) {
 	setPlayPositionBySamples(v * _frequency);
 }
+
+unsigned StaticSound::getFrequency() const {
+	return _frequency;
+}

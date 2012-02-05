@@ -182,3 +182,7 @@ uint64 StreamSound::getPlayPositionBySamples() const {
 float StreamSound::getPlayPositionBySecs() const {
 	return (float)getPlayPositionBySamples() / (float)_decoder->getFrequency();
 }
+
+unsigned StreamSound::getFrequency() const {
+	return _decoder->getFrequency();
+}
