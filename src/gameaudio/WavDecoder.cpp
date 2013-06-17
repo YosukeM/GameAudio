@@ -105,6 +105,9 @@ bool WavDecoder::init(boost::shared_ptr<IFileReader> reader) {
 
 			data_read = true;
 
+		} else if (rescmp(buf4, "fact")) {
+			GET4;
+			GET4;
 		} else {
 			return false;
 		}
